@@ -1,46 +1,49 @@
 {% extends "base.html" %}
 
+{% block message_body %}
+<!-- Main jumbotron for a primary marketing message or call to action -->
+<div class="jumbotron">
+    <h1>简易标注系统</h1>
+
+    <p>This is a template for a simple marketing or informational website. It includes a large callout called a
+        jumbotron and three supporting pieces of content. Use it as a starting point to create something more
+        unique.</p>
+
+    <p><a href="/about" class="btn btn-primary btn-lg" role="button">Learn more &raquo;</a></p>
+</div>
+{% end %}
+
 {% block middle_body %}
 
-    <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="jumbotron">
-        <h1>简易标注系统</h1>
 
-        <p>This is a template for a simple marketing or informational website. It includes a large callout called a
-            jumbotron and three supporting pieces of content. Use it as a starting point to create something more
-            unique.</p>
+<div class="row">
+    <div class="col-md-4">
+        <h2>易用</h2>
 
-        <p><a href="/about" class="btn btn-primary btn-lg" role="button">Learn more &raquo;</a></p>
+        <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris
+            condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis
+            euismod. Donec sed odio dui. </p>
+
+        <p><a class="btn btn-default" href="/about" role="button">View details &raquo;</a></p>
     </div>
+    <div class="col-md-4">
+        <h2>快捷</h2>
 
-    <div class="row">
-        <div class="col-md-4">
-            <h2>易用</h2>
+        <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris
+            condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis
+            euismod. Donec sed odio dui. </p>
 
-            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris
-                condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis
-                euismod. Donec sed odio dui. </p>
-
-            <p><a class="btn btn-default" href="/about" role="button">View details &raquo;</a></p>
-        </div>
-        <div class="col-md-4">
-            <h2>快捷</h2>
-
-            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris
-                condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis
-                euismod. Donec sed odio dui. </p>
-
-            <p><a class="btn btn-default" href="/about" role="button">View details &raquo;</a></p>
-        </div>
-        <div class="col-md-4">
-            <h2>简单</h2>
-
-            <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula
-                porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut
-                fermentum massa justo sit amet risus.</p>
-
-            <p><a class="btn btn-default" href="/about" role="button">View details &raquo;</a></p>
-        </div>
+        <p><a class="btn btn-default" href="/about" role="button">View details &raquo;</a></p>
     </div>
+    <div class="col-md-4">
+        <h2>简单</h2>
+
+        <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula
+            porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut
+            fermentum massa justo sit amet risus.</p>
+
+        <p><a class="btn btn-default" href="/about" role="button">View details &raquo;</a></p>
+    </div>
+</div>
 
 {% end %}

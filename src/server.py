@@ -5,7 +5,6 @@
 __author__ = 'icejoywoo'
 
 import logging
-import os
 import sys
 
 import tornado.httpserver
@@ -13,25 +12,12 @@ import tornado.ioloop
 import tornado.web
 from tornado.options import define, options
 
-from controllers import *
+from config import *
 
 define("port", default=8888, help="listen on the given port", type=int)
 
-url_routers = [
-    (r"/", IndexHandler),
-    (r"/([^/]*)", DefaultHandler)
-]
-
-settings = {
-    "cookie_secret": "61ehsFuYh7EQn42XdTP1o/VooETzKXQAFaYdkL5gEmG=",
-    "template_path": os.path.join(os.path.dirname(__file__), "templates"),
-    "static_path": os.path.join(os.path.dirname(__file__), "static"),
-    "debug": True,
-}
-
-application = tornado.web.Application(url_routers, **settings)
-
 if __name__ == "__main__":
+    application = tornado.web.Application(url_routers, **settings)
     tornado.options.parse_command_line(sys.argv)
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(options.port)

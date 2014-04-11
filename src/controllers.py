@@ -4,10 +4,13 @@
 
 __author__ = 'wujiabin'
 
-import tornado.web
+import time
+
+from tornado import gen
+from tornado import web
 
 
-class BaseHandler(tornado.web.RequestHandler):
+class BaseHandler(web.RequestHandler):
     pass
 
 
@@ -25,3 +28,12 @@ class DefaultHandler(BaseHandler):
     """
     def get(self, name):
         self.render("%s.html" % name)
+
+
+class SleepHandler(BaseHandler):
+
+    @gen.coroutine
+    def get(self):
+        start = time.time()
+        res = yield gen.Task(time.sleep, seconds=5)
+        self.write("when i sleep %f s" % (time.time() - start))

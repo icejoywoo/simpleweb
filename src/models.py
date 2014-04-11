@@ -4,4 +4,12 @@
 
 __author__ = 'icejoywoo'
 
-import pymongo
+import motor
+
+from config import *
+
+
+def get_client():
+    # MotorClient takes the same constructor arguments as MongoClient
+    client = motor.MotorClient(**mongodb_config)
+    return client
