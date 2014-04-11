@@ -4,7 +4,6 @@
 
 __author__ = 'icejoywoo'
 
-# -*- coding:utf-8 -*-
 from tornado import ioloop, httpclient
 import functools
 
