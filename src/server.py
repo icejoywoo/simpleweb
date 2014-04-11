@@ -19,10 +19,11 @@ define("port", default=8888, help="listen on the given port", type=int)
 
 url_routers = [
     (r"/", IndexHandler),
+    (r"/([^/]*)", DefaultHandler)
 ]
 
 settings = {
-    "cookie_secret": "61eJJFuYh7EQnp2XdTP1o/VooETzKXQAGaYdkL5gEmG=",
+    "cookie_secret": "61ehsFuYh7EQn42XdTP1o/VooETzKXQAFaYdkL5gEmG=",
     "template_path": os.path.join(os.path.dirname(__file__), "templates"),
     "static_path": os.path.join(os.path.dirname(__file__), "static"),
     "debug": True,

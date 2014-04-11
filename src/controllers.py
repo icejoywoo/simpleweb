@@ -12,5 +12,16 @@ class BaseHandler(tornado.web.RequestHandler):
 
 
 class IndexHandler(BaseHandler):
+    """
+    index page
+    """
     def get(self):
         self.render("index.html")
+
+
+class DefaultHandler(BaseHandler):
+    """
+    default handler to look up the template named "${name}.html"
+    """
+    def get(self, name):
+        self.render("%s.html" % name)
