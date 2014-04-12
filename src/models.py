@@ -33,7 +33,6 @@ class UserSampleAssociation(Base):
     sample_id = Column(Integer, ForeignKey('sample.id'), primary_key=True)
     # extra data: user对sample的标注结果
     category_id = Column('category_id', Integer, ForeignKey('category.id'))
-    category = relationship("category")
 
 
 class User(Base):
