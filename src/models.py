@@ -14,7 +14,7 @@ But maybe I should use sqlalchemy for sqlite3 or mysql.
 from sqlalchemy import create_engine, func, Table, ForeignKey
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship, backref
+from sqlalchemy.orm import scoped_session, sessionmaker, relationship, backref
 
 
 Base = declarative_base()
@@ -22,7 +22,7 @@ Base = declarative_base()
 
 # entities defination
 
-user_sample_association_table = Table('t_user_sample_association', Base.metadata,
+user_sample_association_table = Table('user_sample_association', Base.metadata,
     Column('user_id', Integer, ForeignKey('user.id')),
     Column('sample_id', Integer, ForeignKey('sample.id')),
     # extra data
@@ -36,10 +36,10 @@ class User(Base):
     """
     __tablename__ = "user"
 
-    id = Column("u_id", Integer, primary_key=True)
-    name = Column("u_name", String(50), required=True)
-    password = Column('password', String(16), required=True)
-    created_at = Column("created_at", DateTime, default=func.now())
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), nullable=False)
+    password = Column(String(16), nullable=False)
+    created_at = Column(DateTime, default=func.now())
     samples = relationship("Sample", secondary=user_sample_association_table,
                            backref="users")
 
@@ -51,8 +51,8 @@ class Category(Base):
     """
     __tablename__ = "category"
 
-    id = Column("c_id", Integer, primary_key=True)
-    name = Column(String(50), required=True)
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
     parent_id = Column(Integer, ForeignKey('category.id'))  # 引用自身id作为外键
     children = relationship("Category")  # 建立one-to-many关系
 
@@ -63,10 +63,10 @@ class Sample(Base):
     """
     __tablename__ = "sample"
 
-    id = Column("s_id", Integer, primary_key=True)
-    data = Column("s_data", String(255), required=True)
-    # 标注交叉评判结果
-    labeled_result = Column("s_category_id", Integer, ForeignKey('category.id'))
+    id = Column(Integer, primary_key=True)
+    data = Column(String(255), nullable=False)
+    # 用户标注结果经过评判后的最终结果
+    labeled_result = Column("s_labeled_result", Integer, ForeignKey('category.id'))
 
 
 class Result(Base):
@@ -75,7 +75,16 @@ class Result(Base):
     """
     __tablename__ = "result"
 
-    id = Column("r_id", Integer, primary_key=True)
-    sample_id = Column("r_sample_id", Integer, ForeignKey("sample.id"))
+    id = Column(Integer, primary_key=True)
+    sample_id = Column(Integer, ForeignKey("sample.id"), nullable=False)
     # 预测结果
-    predict_result = Column("r_category_id", Integer, ForeignKey('category.id'))
+    predict_result = Column(Integer, ForeignKey('category.id'))
+
+if __name__ == "__main__":
+    import sqlalchemy
+    print "version:", sqlalchemy.__version__
+
+    engine = create_engine('sqlite:///:memory:', echo=True)
+    db = scoped_session(sessionmaker(bind=engine))
+
+    Base.metadata.create_all(engine)

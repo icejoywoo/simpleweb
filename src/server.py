@@ -7,6 +7,8 @@ __author__ = 'icejoywoo'
 import logging
 import sys
 
+from sqlalchemy import create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
@@ -15,6 +17,14 @@ from tornado.options import define, options
 from config import *
 
 define("port", default=8888, help="listen on the given port", type=int)
+
+engine = create_engine('sqlite:///:memory:', echo=True)
+
+
+class Application(tornado.web.Application):
+    def __init__(self):
+        tornado.web.Application.__init__(self, url_routers, **settings)
+        self.db = scoped_session(sessionmaker(bind=engine))
 
 if __name__ == "__main__":
     application = tornado.web.Application(url_routers, **settings)
