@@ -10,7 +10,6 @@ from controllers import *
 
 # urls routers config
 url_routers = [
-    (r"/sleep", SleepHandler),
     (r"/", IndexHandler),
     (r"/([^/]*)", DefaultHandler),
 ]
@@ -27,5 +26,5 @@ settings = {
 # http://api.mongodb.org/python/current/api/pymongo/mongo_client.html#pymongo.mongo_client.MongoClient
 mongodb_config = {
     "host": "localhost",
-    "port": 27071
+    "port": 27071,
 }

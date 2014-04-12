@@ -4,7 +4,6 @@
 
 __author__ = 'wujiabin'
 
-from tornado import gen
 from tornado import web
 
 
@@ -26,3 +25,4 @@ class DefaultHandler(BaseHandler):
     """
     def get(self, name):
         self.render("%s.html" % name)
+
