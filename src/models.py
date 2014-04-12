@@ -39,6 +39,9 @@ class Category(Base):
     def __repr__(self):
         return "<Category: %(name)r>" % self.__dict__
 
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
 
 class UserSampleAssociation(Base):
     """
@@ -66,6 +69,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False, unique=True)
+    nickname = Column(String(50), nullable=False)
     password = Column(String(16), nullable=False)
     created_at = Column(DateTime, default=func.now())
     samples = relationship("UserSampleAssociation")

@@ -15,10 +15,11 @@ import tornado.web
 from tornado.options import define, options
 
 from config import *
+from models import *
 
 define("port", default=8888, help="listen on the given port", type=int)
 
-engine = create_engine('sqlite:///:memory:', echo=True)
+engine = create_engine('sqlite:///sqlite3.db', echo=True)
 
 
 class Application(tornado.web.Application):

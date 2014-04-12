@@ -10,6 +10,10 @@ from controllers import *
 
 # urls routers config
 url_routers = [
+    # category
+    (r"/category", CategoryHandler),
+
+    # default
     (r"/", IndexHandler),
     (r"/([^/]*)", DefaultHandler),
 ]

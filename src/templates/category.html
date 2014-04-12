@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="static/css/zTreeStyle/zTreeStyle.css" type="text/css">
+{% end %}
+
+{% block message_body %}{% end %}
+
+{% block middle_body %}
+<div class="col-sm-3 col-sm-offset-1">
+    <h1>分类</h1>
+
+    <div class="left">
+        <ul id="category_tree" class="ztree"></ul>
+    </div>
+
+</div>
+{% end %}
+
+{% block body_tail %}
+<script src="static/js/jquery.ztree.all.min.js"></script>
+<script>
+    var setting = {
+        data: {
+            simpleData: {
+                enable: true
+            }
+        }
+    };
+    $(document).ready(function () {
+        $.get("/category?all", function (data, textStatus){
+            // 处理data格式为ztree可以处理的格式
+            var nodes = new Array();
+            for (var i in data) {
+                if (data[i]["parent_id"] === null) {
+                    data[i]["isParent"] = true;
+                }
+                data[i]["pId"] = data[i]["parent_id"]
+                nodes.push(data[i]);
+            }
+            $.fn.zTree.init($("#category_tree"), setting, nodes);
+        });
+    });
+</script>
+{% end %}
