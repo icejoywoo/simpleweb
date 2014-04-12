@@ -22,12 +22,18 @@ Base = declarative_base()
 
 # entities defination
 
-user_sample_association_table = Table('user_sample_association', Base.metadata,
-    Column('user_id', Integer, ForeignKey('user.id')),
-    Column('sample_id', Integer, ForeignKey('sample.id')),
-    # extra data
-    Column('category_id', Integer, ForeignKey('category.id'))
-)
+
+class UserSampleAssociation(Base):
+    """
+    user和sample多对多中间表
+    """
+    __tablename__ = 'user_sample_association'
+
+    user_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
+    sample_id = Column(Integer, ForeignKey('sample.id'), primary_key=True)
+    # extra data: user对sample的标注结果
+    category_id = Column('category_id', Integer, ForeignKey('category.id'))
+    category = relationship("category")
 
 
 class User(Base):
@@ -40,7 +46,7 @@ class User(Base):
     name = Column(String(50), nullable=False)
     password = Column(String(16), nullable=False)
     created_at = Column(DateTime, default=func.now())
-    samples = relationship("Sample", secondary=user_sample_association_table,
+    samples = relationship("Sample", secondary=UserSampleAssociation,
                            backref="users")
 
 
@@ -54,7 +60,7 @@ class Category(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(50))
     parent_id = Column(Integer, ForeignKey('category.id'))  # 引用自身id作为外键
-    children = relationship("Category")  # 建立one-to-many关系
+    children = relationship("category")  # 建立one-to-many关系
 
 
 class Sample(Base):
@@ -77,14 +83,19 @@ class Result(Base):
 
     id = Column(Integer, primary_key=True)
     sample_id = Column(Integer, ForeignKey("sample.id"), nullable=False)
-    # 预测结果
-    predict_result = Column(Integer, ForeignKey('category.id'))
+    # 预测结果的category_id
+    category_id = Column(Integer, ForeignKey('category.id'))
+    category = relationship("category")
+    sample = relationship("sample")
 
 if __name__ == "__main__":
     import sqlalchemy
     print "version:", sqlalchemy.__version__
 
-    engine = create_engine('sqlite:///:memory:', echo=True)
+    engine = create_engine('sqlite:///sqlite3.db', echo=True)
     db = scoped_session(sessionmaker(bind=engine))
 
     Base.metadata.create_all(engine)
+
+    category = Category()
+    print category
