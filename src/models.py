@@ -21,6 +21,23 @@ Base = declarative_base()
 
 
 # entities defination
+class Category(Base):
+    """
+    对Sample数据进行分类的信息, 例如: 购物, 饮食等.
+    自引用, 一对多, 树状结构
+    """
+    __tablename__ = "category"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), nullable=False, unique=True)
+    parent_id = Column(Integer, ForeignKey('category.id'))  # 引用自身id作为外键
+    children = relationship("Category")  # 建立one-to-many关系
+
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return "<Category: %(name)r>" % self.__dict__
 
 
 class UserSampleAssociation(Base):
@@ -31,8 +48,14 @@ class UserSampleAssociation(Base):
 
     user_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
     sample_id = Column(Integer, ForeignKey('sample.id'), primary_key=True)
+    sample = relationship("Sample")
+    user = relationship("User")
     # extra data: user对sample的标注结果
     category_id = Column('category_id', Integer, ForeignKey('category.id'))
+    category = relationship("Category")
+
+    def __repr__(self):
+        return "<UserSampleAssociation: %r, %r>" % (self.user, self.sample)
 
 
 class User(Base):
@@ -42,24 +65,33 @@ class User(Base):
     __tablename__ = "user"
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(50), nullable=False)
+    name = Column(String(50), nullable=False, unique=True)
     password = Column(String(16), nullable=False)
     created_at = Column(DateTime, default=func.now())
-    samples = relationship("Sample", secondary=UserSampleAssociation,
-                           backref="users")
+    samples = relationship("UserSampleAssociation")
+
+    def __init__(self, name, password):
+        self.name = name
+        self.password = password
+
+    def __repr__(self):
+        return "<User: %(name)r>" % self.__dict__
 
 
-class Category(Base):
+class SampleType(Base):
     """
-    对Sample数据进行分类的信息, 例如: 购物, 饮食等.
-    自引用, 一对多, 树状结构
+    预测方法
     """
-    __tablename__ = "category"
+    __tablename__ = "sample_type"
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(50))
-    parent_id = Column(Integer, ForeignKey('category.id'))  # 引用自身id作为外键
-    children = relationship("category")  # 建立one-to-many关系
+    name = Column(String(50), nullable=False, unique=True)
+
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return "<SampleType: %(name)r>" % self.__dict__
 
 
 class Sample(Base):
@@ -69,9 +101,20 @@ class Sample(Base):
     __tablename__ = "sample"
 
     id = Column(Integer, primary_key=True)
+    sample_type_id = Column(Integer, ForeignKey('sample_type.id'))
+    sample_type = relationship("SampleType")
+    # 需要标注的样本数据
     data = Column(String(255), nullable=False)
+    users = relationship("UserSampleAssociation")
     # 用户标注结果经过评判后的最终结果
-    labeled_result = Column("s_labeled_result", Integer, ForeignKey('category.id'))
+    labeled_result = Column(Integer, ForeignKey('category.id'))
+    category = relationship("Category")
+
+    def __init__(self, data):
+        self.data = data
+
+    def __repr__(self):
+        return "<User: %(data)r>" % self.__dict__
 
 
 class Result(Base):
@@ -82,10 +125,58 @@ class Result(Base):
 
     id = Column(Integer, primary_key=True)
     sample_id = Column(Integer, ForeignKey("sample.id"), nullable=False)
+    sample = relationship("Sample", backref=backref("result", uselist=False))
+
     # 预测结果的category_id
     category_id = Column(Integer, ForeignKey('category.id'))
-    category = relationship("category")
-    sample = relationship("sample")
+    category = relationship("Category")
+
+    method_id = Column(Integer, ForeignKey('method.id'))
+    method = relationship("Method", backref=backref("result", uselist=False))
+
+    evaluate_id = Column(Integer, ForeignKey('evaluate.id'))
+    evaluate = relationship("Evaluate", backref=backref("result", uselist=False))
+
+    def __init__(self, sample, method, category):
+        self.sample = sample
+        self.method = method
+        self.category = category
+
+    def __repr__(self):
+        return "<Result: %r, %r, %r>" % (self.sample, self.method, self.category)
+
+
+class Method(Base):
+    """
+    预测方法
+    """
+    __tablename__ = "method"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), nullable=False, unique=True)
+
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return "<Method: %(name)r>" % self.__dict__
+
+
+class Evaluate(Base):
+    """
+    算法的结果进行评估, 例如好, 中, 差
+    """
+    __tablename__ = "evaluate"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), nullable=False, unique=True)
+
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return "<Evaluate: %(name)r>" % self.__dict__
+
 
 if __name__ == "__main__":
     import sqlalchemy
@@ -96,5 +187,33 @@ if __name__ == "__main__":
 
     Base.metadata.create_all(engine)
 
-    category = Category()
-    print category
+    # 分类名称树, 可以无线递归下去
+    category = Category(u"影视")
+    category.children.append(Category(u"电影"))
+    category.children.append(Category(u"电视"))
+    print category, category.children
+    db.add(category)
+    db.commit()
+
+    # user和sample
+    user = User("admin", "123456")
+    print user
+    a = UserSampleAssociation()
+    sample = Sample("test")
+    a.sample = sample
+    a.sample.category = category
+    user.samples.append(a)
+    print user.samples
+    print user.samples[0].sample.users
+    db.add(a)
+    db.add(user)
+    db.commit()
+    print a.sample.users
+
+    # result
+    method = Method("dnn")
+    result = Result(sample, method, category)
+    db.add(method)
+    db.add(result)
+    db.commit()
+    print result
