@@ -22,12 +22,12 @@ engine = create_engine('sqlite:///:memory:', echo=True)
 
 
 class Application(tornado.web.Application):
-    def __init__(self):
-        tornado.web.Application.__init__(self, url_routers, **settings)
+    def __init__(self, args, **kwargs):
+        tornado.web.Application.__init__(self, args, **kwargs)
         self.db = scoped_session(sessionmaker(bind=engine))
 
 if __name__ == "__main__":
-    application = tornado.web.Application(url_routers, **settings)
+    application = Application(url_routers, **settings)
     tornado.options.parse_command_line(sys.argv)
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(options.port)

@@ -18,6 +18,7 @@ class IndexHandler(BaseHandler):
     index page
     """
     def get(self):
+        print self.db
         self.render("index.html")
 
 
