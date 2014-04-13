@@ -40,14 +40,31 @@
     $('#method_table').edatagrid({
         autoSave: true,
         url: "/method?all",
-        updateUrl: "/method",
         saveUrl: "/method",
         onDestroy: function(index, row){
             $.ajax({
-                url: '/method/' + index,
+                url: '/method/' + row.id,
                 type: 'DELETE',
                 success: function(result) {
                     // Do something with the result
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(errorThrown);
+                    alert("删除失败");
+                }
+            });
+        },
+        onUpdate: function(index, row){
+            $.ajax({
+                url: '/method/' + row.id,
+                type: 'PUT',
+                data: row,
+                success: function(data, textStatus) {
+                    // Do something with the result
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(errorThrown);
+                    alert("更新失败");
                 }
             });
         }

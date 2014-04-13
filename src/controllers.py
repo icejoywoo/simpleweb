@@ -103,13 +103,7 @@ class MethodHandler(BaseHandler):
             self.write(method_json)
         else:
             kvargs = {k: escape.to_unicode(''.join(v)) for k, v in self.request.arguments.items()}
-            try:
-                m = self.db.query(Method).filter_by(id=int(kvargs["id"])).one()
-                m.name = kvargs["name"]
-                m.description = kvargs["description"]
-                print m
-            except:
-                m = Method(kvargs["name"], kvargs["description"])
+            m = Method(kvargs["name"], kvargs["description"])
 
             # 注意session的使用
             try:
@@ -126,6 +120,22 @@ class MethodHandler(BaseHandler):
         # 注意session的使用
         try:
             self.db.delete(m)
+            self.db.commit()
+        except:
+            self.db.rollback()
+            raise
+        finally:
+            self.db.close()
+
+    def put(self, _id):
+        kvargs = {k: escape.to_unicode(''.join(v)) for k, v in self.request.arguments.items()}
+        print kvargs
+        m = self.db.query(Method).filter_by(id=_id).one()
+        m.name = kvargs["name"]
+        m.description = kvargs["description"]
+        # 注意session的使用
+        try:
+            self.db.add(m)
             self.db.commit()
         except:
             self.db.rollback()

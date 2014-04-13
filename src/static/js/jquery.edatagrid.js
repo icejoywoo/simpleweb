@@ -93,7 +93,11 @@
 						opts.onSave.call(target, index, row);
 					},'json');
 				} else {
-					opts.onSave.call(target, index, row);
+                    if (row.isNewRecord) {
+                        opts.onSave.call(target, index, row);
+                    } else{
+                        opts.onUpdate.call(target, index, row);
+                    }
 				}
 				if (opts.onAfterEdit) opts.onAfterEdit.call(target, index, row);
 			},
@@ -422,6 +426,7 @@
 		onEdit: function(index, row){},
 		onBeforeSave: function(index){},
 		onSave: function(index, row){},
+        onUpdate: function(index, row){},
 		onDestroy: function(index, row){},
 		onError: function(index, row){}
 	});
