@@ -15,6 +15,28 @@
     </div>
 
 </div>
+
+<div class="col-sm-8">
+    <h1>新建</h1>
+    <form role="form" method="post" action="/category" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" id="name" name="name" placeholder="分类名称">
+        </div>
+        <div class="form-group">
+            <label>父分类</label>
+            <select class="form-control" id="parent_id" name="parent_id">
+                <option value>无</option>
+                {% for p in parents %}
+                    {% block p %}
+                        <option value="{{ p.id }}">{{ p.name }}</option>
+                    {% end %}
+                {% end %}
+            </select>
+        </div>
+        <input type="submit" class="btn btn-default"></input>
+    </form>
+</div>
 {% end %}
 
 {% block body_tail %}
@@ -28,7 +50,7 @@
         }
     };
     $(document).ready(function () {
-        $.get("/category?all", function (data, textStatus){
+        $.get("/category?all", function (data, textStatus) {
             // 处理data格式为ztree可以处理的格式
             var nodes = new Array();
             for (var i in data) {
@@ -38,6 +60,7 @@
                 data[i]["pId"] = data[i]["parent_id"]
                 nodes.push(data[i]);
             }
+            // 初始化ztree
             $.fn.zTree.init($("#category_tree"), setting, nodes);
         });
     });

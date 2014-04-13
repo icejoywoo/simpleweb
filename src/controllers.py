@@ -7,6 +7,7 @@ __author__ = 'wujiabin'
 import json
 
 from tornado import web
+from tornado import escape
 
 from models import *
 
@@ -35,10 +36,11 @@ class DefaultHandler(BaseHandler):
 
 class CategoryHandler(BaseHandler):
     def get(self):
-        print self.request.arguments
         # 默认显示页面
         if not self.request.arguments:
-            self.render("category.html")
+            # 获取无父节点的分类
+            parents = self.db.query(Category).filter_by(parent_id=None).all()
+            self.render("category.html", parents=parents)
         # 获取全部数据
         elif "all" in self.request.arguments:
             category_json = json.dumps([i.as_dict() for i in self.db.query(Category).all()])
@@ -56,3 +58,22 @@ class CategoryHandler(BaseHandler):
                 self.write(json.dumps(data[0]))
             else:
                 self.write(json.dumps(data))
+
+    def post(self):
+        kvargs = {k: ''.join(v) for k, v in self.request.arguments.items()}
+        name = escape.to_unicode(kvargs["name"])
+        c = Category(name)
+        if kvargs["parent_id"]:
+            parent_id = int(kvargs["parent_id"])
+            c.parent_id = parent_id
+        # 注意session的使用
+        try:
+            self.db.add(c)
+            self.db.commit()
+        except:
+            self.db.rollback()
+            raise
+        finally:
+            self.db.close()
+        parents = self.db.query(Category).filter_by(parent_id=None).all()
+        self.render("category.html", parents=parents)
