@@ -107,10 +107,6 @@
         });
     });
     function updateActions(index, row) {
-        $('#sample_table').datagrid('updateRow', {
-            index: index,
-            row: {}
-        });
         // 转换格式
         row["labeled_result"] = parseInt(row["labeled_result"]);
         console.log(row);
@@ -120,6 +116,10 @@
             data: row,
             success: function (data, textStatus) {
                 // Do something with the result
+                $('#sample_table').datagrid('updateRow', {
+                    index: index,
+                    row: {}
+                });
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
                 console.log(errorThrown);
@@ -137,7 +137,23 @@
     function deleterow(target) {
         $.messager.confirm('Confirm', 'Are you sure?', function (r) {
             if (r) {
-                $('#sample_table').datagrid('deleteRow', getRowIndex(target));
+                console.log($('#sample_table').datagrid('getRows'));
+                var row = $('#sample_table').datagrid('getRows')[getRowIndex(target)];
+                console.log(getRowIndex(target))
+                console.log(row);
+                $.ajax({
+                    url: '/sample/' + row.id,
+                    type: 'DELETE',
+                    data: row,
+                    success: function (data, textStatus) {
+                        // Do something with the result
+                        $('#sample_table').datagrid('deleteRow', getRowIndex(target));
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        console.log(errorThrown);
+                        alert("更新失败");
+                    }
+                });
             }
         });
     }

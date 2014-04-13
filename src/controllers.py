@@ -166,11 +166,23 @@ class SampleHandler(BaseHandler):
     def put(self, _id):
         kvargs = {k: escape.to_unicode(''.join(v)) for k, v in self.request.arguments.items()}
         print kvargs
-        m = self.db.query(Sample).filter_by(id=_id).one()
-        m.labeled_result = kvargs["labeled_result"]
+        s = self.db.query(Sample).filter_by(id=_id).one()
+        s.labeled_result = kvargs["labeled_result"]
         # 注意session的使用
         try:
-            self.db.add(m)
+            self.db.add(s)
+            self.db.commit()
+        except:
+            self.db.rollback()
+            raise
+        finally:
+            self.db.close()
+
+    def delete(self, _id):
+        s = self.db.query(Sample).filter_by(id=_id).one()
+        # 注意session的使用
+        try:
+            self.db.delete(s)
             self.db.commit()
         except:
             self.db.rollback()
