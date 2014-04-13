@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="static/css/easyui-themes/bootstrap/easyui.css" type="text/css">
+<link rel="stylesheet" href="static/css/easyui-themes/icon.css" type="text/css">
+{% end %}
+
+{% block message_body %}{% end %}
+
+{% block middle_body %}
+<table class="table" id="sample_table">
+</table>
+{% end %}
+
+{% block body_tail %}
+<script src="static/js/jquery.easyui.min.js"></script>
+<script>
+    $(function () {
+        $.get("/category?all", function (categories, status) {
+            console.log(categories);
+            $('#sample_table').datagrid({
+                title: '样本数据',
+                iconCls: 'icon-edit',
+                width: 1000,
+                height: 500,
+                singleSelect: true,
+                idField: 'id',
+                url: '/sample?all',
+                sortable: true,
+                columns: [
+                    [
+                        {field: 'id', title: 'Sample ID', width: 60},
+                        {field: 'data', title: '样本数据', width: 150},
+                        {field: 'labeled_result', title: '标注结果', width: 100,
+                            formatter: function (value, row, index) {
+                                for (var i = 0; i < categories.length; i++) {
+                                    if (categories[i].id == value)
+                                        return categories[i].name;
+                                }
+                                return value;
+                            },
+                            editor: {
+                                type: 'combobox',
+                                options: {
+                                    valueField: 'id',
+                                    textField: 'name',
+                                    data: categories,
+                                    required: true,
+                                    getValue: function (target) {
+                                        console.log($(target).val());
+                                        return parseInt($(target).val());
+                                    }
+                                }
+                            }
+                        },
+                        {field: 'action', title: '操作', width: 70, align: 'center',
+                            formatter: function (value, row, index) {
+                                if (row.editing) {
+                                    var s = '<a href="#" onclick="saverow(this)">Save</a> ';
+                                    var c = '<a href="#" onclick="cancelrow(this)">Cancel</a>';
+                                    return s + c;
+                                } else {
+                                    var e = '<a href="#" onclick="editrow(this)">Edit</a> ';
+                                    var d = '<a href="#" onclick="deleterow(this)">Delete</a>';
+                                    return e + d;
+                                }
+                            }
+                        }
+                    ]
+                ],
+                toolbar: [
+                    {
+                        text: '增加',
+                        iconCls: 'icon-add',
+                        handler: addrow
+                    },
+                    {
+                        text: '保存',
+                        iconCls: 'icon-save',
+                        handler: saveall
+                    },
+                    {
+                        text: '取消',
+                        iconCls: 'icon-cancel',
+                        handler: cancelall
+                    }
+                ],
+                onBeforeEdit: function (index, row) {
+                    row.editing = true;
+                    $('#sample_table').datagrid('updateRow', {
+                        index: index,
+                        row: {}
+                    });
+                },
+                onAfterEdit: function (index, row) {
+                    row.editing = false;
+                    updateActions(index, row);
+                },
+                onCancelEdit: function (index, row) {
+                    row.editing = false;
+                    $('#sample_table').datagrid('updateRow', {
+                        index: index,
+                        row: {}
+                    });
+                }
+            });
+        });
+    });
+    function updateActions(index, row) {
+        $('#sample_table').datagrid('updateRow', {
+            index: index,
+            row: {}
+        });
+        // 转换格式
+        row["labeled_result"] = parseInt(row["labeled_result"]);
+        console.log(row);
+        $.ajax({
+            url: '/sample/' + row.id,
+            type: 'PUT',
+            data: row,
+            success: function (data, textStatus) {
+                // Do something with the result
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log(errorThrown);
+                alert("更新失败");
+            }
+        });
+    }
+    function getRowIndex(target) {
+        var tr = $(target).closest('tr.datagrid-row');
+        return parseInt(tr.attr('datagrid-row-index'));
+    }
+    function editrow(target) {
+        $('#sample_table').datagrid('beginEdit', getRowIndex(target));
+    }
+    function deleterow(target) {
+        $.messager.confirm('Confirm', 'Are you sure?', function (r) {
+            if (r) {
+                $('#sample_table').datagrid('deleteRow', getRowIndex(target));
+            }
+        });
+    }
+    function saverow(target) {
+        $('#sample_table').datagrid('endEdit', getRowIndex(target));
+    }
+    function cancelrow(target) {
+        $('#sample_table').datagrid('cancelEdit', getRowIndex(target));
+    }
+    function addrow(target) {
+        $('#sample_table').datagrid('appendRow', {
+            name: '',
+            data: '',
+            sample_type: '',
+            sample_type_id: null,
+            labeled_result: null,
+            category: null
+        });
+    }
+    function saveall() {
+        $('#sample_table').datagrid('acceptChanges');
+    }
+    function cancelall() {
+        $('#sample_table').datagrid('rejectChanges');
+    }
+</script>
+{% end %}

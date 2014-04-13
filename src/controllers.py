@@ -142,3 +142,38 @@ class MethodHandler(BaseHandler):
             raise
         finally:
             self.db.close()
+
+
+class SampleHandler(BaseHandler):
+
+    def get(self):
+        if "all" in self.request.arguments:
+            samples = self.db.query(Sample).all()
+            print samples[1].category
+            data = [i.as_dict() for i in samples]
+            sample_json = json.dumps(data)
+            self.set_header("Content-Type", "application/json")
+            self.write(sample_json)
+        else:
+            self.render("sample.html")
+
+    def post(self):
+        if "all" in self.request.arguments:
+            sample_json = json.dumps([i.as_dict() for i in self.db.query(Sample).all()])
+            self.set_header("Content-Type", "application/json")
+            self.write(sample_json)
+
+    def put(self, _id):
+        kvargs = {k: escape.to_unicode(''.join(v)) for k, v in self.request.arguments.items()}
+        print kvargs
+        m = self.db.query(Sample).filter_by(id=_id).one()
+        m.labeled_result = kvargs["labeled_result"]
+        # 注意session的使用
+        try:
+            self.db.add(m)
+            self.db.commit()
+        except:
+            self.db.rollback()
+            raise
+        finally:
+            self.db.close()

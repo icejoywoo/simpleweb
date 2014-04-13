@@ -10,10 +10,16 @@ from controllers import *
 
 # urls routers config
 url_routers = [
-    # category
+    # 分类管理
     (r"/category", CategoryHandler),
+
+    # 方法管理
     (r"/method", MethodHandler),
     (r"/method/([0-9]+)", MethodHandler),
+
+    # 样本管理
+    (r"/sample", SampleHandler),
+    (r"/sample/([0-9]+)", SampleHandler),
 
     # default
     (r"/", IndexHandler),
@@ -22,7 +28,7 @@ url_routers = [
 
 # tornado config
 settings = {
-    "cookie_secret": "61ehsFuYh7EQn42XdTP1o/VooETzKXQAFaYdkL5gEmG=",
+    "cookie_secret": "35ehsFuYh7EQn42XdTP1o/VooETzKXQAFaYdkL5gEmG=",
     "template_path": os.path.join(os.path.dirname(__file__), "templates"),
     "static_path": os.path.join(os.path.dirname(__file__), "static"),
     "debug": True,

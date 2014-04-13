@@ -85,7 +85,7 @@ class User(Base):
 
 class SampleType(Base):
     """
-    预测方法
+    样本所属类型
     """
     __tablename__ = "sample_type"
 
@@ -120,6 +120,12 @@ class Sample(Base):
 
     def __repr__(self):
         return "<User: %(data)r>" % self.__dict__
+
+    def as_dict(self):
+        ret = {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        ret["category"] = self.category.name if self.category else None
+        ret["sample_type"] = self.sample_type.name if self.sample_type else None
+        return ret
 
 
 class Result(Base):
@@ -209,7 +215,7 @@ if __name__ == "__main__":
     user = User("admin", "admin", "123456")
     print user
     a = UserSampleAssociation()
-    sample = Sample("test")
+    sample = Sample(u"My盛Lady")
     a.sample = sample
     a.sample.category = category
     user.samples.append(a)
@@ -220,10 +226,16 @@ if __name__ == "__main__":
     db.commit()
     print a.sample.users
 
+    for i in xrange(100):
+        sample = Sample("test_sample_url_%d" % i)
+        db.add(sample)
+        db.commit()
+
     # result
-    method = Method("dnn", "Deep Netron Network")
-    result = Result(sample, method, category)
-    db.add(method)
+    for i in xrange(100):
+        method = Method("dnn%d" % i, "Deep Netron Network")
+        result = Result(sample, method, category)
+        db.add(method)
     db.add(result)
     db.commit()
     print result
