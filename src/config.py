@@ -12,6 +12,8 @@ from controllers import *
 url_routers = [
     # category
     (r"/category", CategoryHandler),
+    (r"/method", MethodHandler),
+    (r"/method/([0-9]+)", MethodHandler),
 
     # default
     (r"/", IndexHandler),

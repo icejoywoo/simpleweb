@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="static/css/easyui-themes/bootstrap/easyui.css" type="text/css">
+<link rel="stylesheet" href="static/css/easyui-themes/icon.css" type="text/css">
+{% end %}
+
+{% block message_body %}{% end %}
+
+{% block middle_body %}
+<table class="table" id="method_table"
+       title="Editable Method Table"
+       singleSelect="true"
+       idField="id"
+       toolbar="#toolbar"
+       rownumbers="true" fitColumns="true" singleSelect="true">
+    <thead>
+    <tr>
+        <th field="name" width="100" editor="text">名字</th>
+        <th field="description" width="1100" editor="text">备注</th>
+    </tr>
+    </thead>
+</table>
+<div id="toolbar">
+    <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true"
+       onclick="javascript:$('#method_table').edatagrid('addRow')">New</a>
+    <a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true"
+       onclick="javascript:$('#method_table').edatagrid('destroyRow')">Destroy</a>
+    <a href="#" class="easyui-linkbutton" iconCls="icon-save" plain="true"
+       onclick="javascript:$('#method_table').edatagrid('saveRow')">Save</a>
+    <a href="#" class="easyui-linkbutton" iconCls="icon-undo" plain="true"
+       onclick="javascript:$('#method_table').edatagrid('cancelRow')">Cancel</a>
+</div>
+{% end %}
+
+{% block body_tail %}
+<script src="static/js/jquery.easyui.min.js"></script>
+<script src="static/js/jquery.edatagrid.js"></script>
+<script>
+    $('#method_table').edatagrid({
+        autoSave: true,
+        url: "/method?all",
+        updateUrl: "/method",
+        saveUrl: "/method",
+        onDestroy: function(index, row){
+            $.ajax({
+                url: '/method/' + index,
+                type: 'DELETE',
+                success: function(result) {
+                    // Do something with the result
+                }
+            });
+        }
+    });
+</script>
+{% end %}

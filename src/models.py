@@ -74,8 +74,9 @@ class User(Base):
     created_at = Column(DateTime, default=func.now())
     samples = relationship("UserSampleAssociation")
 
-    def __init__(self, name, password):
+    def __init__(self, name, nickname, password):
         self.name = name
+        self.nickname = nickname
         self.password = password
 
     def __repr__(self):
@@ -158,12 +159,17 @@ class Method(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False, unique=True)
+    description = Column(String(255))
 
-    def __init__(self, name):
+    def __init__(self, name, description):
         self.name = name
+        self.description = description
 
     def __repr__(self):
         return "<Method: %(name)r>" % self.__dict__
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
 class Evaluate(Base):
@@ -200,7 +206,7 @@ if __name__ == "__main__":
     db.commit()
 
     # user和sample
-    user = User("admin", "123456")
+    user = User("admin", "admin", "123456")
     print user
     a = UserSampleAssociation()
     sample = Sample("test")
@@ -215,7 +221,7 @@ if __name__ == "__main__":
     print a.sample.users
 
     # result
-    method = Method("dnn")
+    method = Method("dnn", "Deep Netron Network")
     result = Result(sample, method, category)
     db.add(method)
     db.add(result)

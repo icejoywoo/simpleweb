@@ -62,7 +62,10 @@ class CategoryHandler(BaseHandler):
     def post(self):
         kvargs = {k: ''.join(v) for k, v in self.request.arguments.items()}
         name = escape.to_unicode(kvargs["name"])
-        c = Category(name)
+        try:
+            c = self.db.query(Category).filter_by(name=name).one()
+        except:
+            c = Category(name)
         if kvargs["parent_id"]:
             parent_id = int(kvargs["parent_id"])
             c.parent_id = parent_id
@@ -75,5 +78,57 @@ class CategoryHandler(BaseHandler):
             raise
         finally:
             self.db.close()
+        # redirect到原来的页面
         parents = self.db.query(Category).filter_by(parent_id=None).all()
         self.render("category.html", parents=parents)
+
+
+class MethodHandler(BaseHandler):
+
+    def get(self):
+        # 默认显示页面
+        if not self.request.arguments:
+            # 获取无父节点的分类
+            self.render("method.html")
+        # 获取全部数据
+        elif "all" in self.request.arguments:
+            method_json = json.dumps([i.as_dict() for i in self.db.query(Method).all()])
+            self.set_header("Content-Type", "application/json")
+            self.write(method_json)
+
+    def post(self):
+        if "all" in self.request.arguments:
+            method_json = json.dumps([i.as_dict() for i in self.db.query(Method).all()])
+            self.set_header("Content-Type", "application/json")
+            self.write(method_json)
+        else:
+            kvargs = {k: escape.to_unicode(''.join(v)) for k, v in self.request.arguments.items()}
+            try:
+                m = self.db.query(Method).filter_by(id=int(kvargs["id"])).one()
+                m.name = kvargs["name"]
+                m.description = kvargs["description"]
+                print m
+            except:
+                m = Method(kvargs["name"], kvargs["description"])
+
+            # 注意session的使用
+            try:
+                self.db.add(m)
+                self.db.commit()
+            except:
+                self.db.rollback()
+                raise
+            finally:
+                self.db.close()
+
+    def delete(self, _id):
+        m = self.db.query(Method).filter_by(id=_id).one()
+        # 注意session的使用
+        try:
+            self.db.delete(m)
+            self.db.commit()
+        except:
+            self.db.rollback()
+            raise
+        finally:
+            self.db.close()
