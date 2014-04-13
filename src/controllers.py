@@ -79,8 +79,7 @@ class CategoryHandler(BaseHandler):
         finally:
             self.db.close()
         # redirect到原来的页面
-        parents = self.db.query(Category).filter_by(parent_id=None).all()
-        self.render("category.html", parents=parents)
+        self.redirect("/category")
 
 
 class MethodHandler(BaseHandler):
