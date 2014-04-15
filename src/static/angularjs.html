@@ -3,11 +3,25 @@
     <head>
         <script src="js/angular.min.js"></script>
         <script src="js/main.js"></script>
+
+        <link href="css/prettify.css" rel="stylesheet">
     </head>
     <body>
-        {{ name }}
+        <p>{{ name }}</p>
         Your name: <input type="text" ng-model="yourname" placeholder="World">
         <hr>
         Hello {{yourname || 'World'}}!
+
+        <div ng-controller="MyController">
+          {{ person.name }}
+        </div>
+
+        <div ng-controller="ParentController">
+          <div ng-controller="ChildController">
+            <input type="text" ng-model="person.name" placeholder="Name"></input>
+            <button ng-click="sayHello()">Say hello</button>
+          </div>
+          {{ person }}
+        </div>
     </body>
 </html>
