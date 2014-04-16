@@ -1,0 +1,32 @@
+<!doctype html>
+<html ng-app>
+    <head>
+        <title>Angular JS Demo</title>
+        <script src="js/angular.min.js"></script>
+        <script src="js/main.js"></script>
+    </head>
+    <body ng-app="myApp">
+        {{ name }}
+        <div ng-show="!loggedIn">
+            点击 <a href="#/login">这里</a> 登录
+        </div>
+        Your name: <input type="text" ng-model="yourname" placeholder="World">
+        <hr>
+        Hello {{yourname || 'World'}}!
+        <div>
+            <div>{{ 9999 | number }}</div>
+            <div>{{ 9999+1 | number:2 }}</div>
+            <div>{{ 9*9 | currency }}</div>
+            <div>{{ 'Hello World' | uppercase }}</div>
+
+            <div ng-init="friends = [{name:'John', age:25}, {name:'Mary', age:28}]">
+                I have {{friends.length}} friends. They are:
+                <ul>
+                    <li ng-repeat="friend in friends">
+                        [{{$index + 1}}] {{friend.name}} who is {{friend.age}} years old.
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </body>
+</html>
