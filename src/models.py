@@ -198,6 +198,7 @@ if __name__ == "__main__":
     import sqlalchemy
     print "version:", sqlalchemy.__version__
 
+    #engine = create_engine('sqlite:///:memory:', echo=True)
     engine = create_engine('sqlite:///sqlite3.db', echo=True)
     db = scoped_session(sessionmaker(bind=engine))
 
@@ -239,3 +240,7 @@ if __name__ == "__main__":
     db.add(result)
     db.commit()
     print result
+
+    # count
+    print db.query(Category).count()
+    print db.query(Category).filter(Category.parent_id != None).count()
