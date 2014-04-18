@@ -1,10 +1,25 @@
 /**
- * Created by wujiabin on 14-4-15.
+ * Created by icejoywoo on 14-4-15.
  */
 
-// 定义module
 var app = angular.module('myApp', []);
 
-app.run(function($rootScope) {
+app.run(function ($rootScope) {
     $rootScope.name = "icejoywoo";
+});
+
+app.controller('MyController', function($scope) {
+    $scope.person = {
+        name: "icejoywoo"
+    }
+});
+
+app.controller('ParentController', function($scope) {
+  $scope.person = {greeted: false};
+});
+
+app.controller('ChildController', function($scope) {
+  $scope.sayHello = function() {
+    $scope.person.greeted = true;
+  }
 });
