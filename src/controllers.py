@@ -5,9 +5,12 @@
 __author__ = 'wujiabin'
 
 import json
+import logging
+import uuid
 
 from tornado import web
 from tornado import escape
+from tornado import websocket
 
 from models import *
 
@@ -52,6 +55,68 @@ class JsonpHandler(BaseHandler):
             }
             self.set_header("Content-Type", "text/javascript")
             self.write("%s(%s)" % (callback, json.dumps(data)))
+
+
+class ChatHandler(BaseHandler):
+    callbacks = set()
+    users = set()
+
+    def send_message(self, message):
+        for handler in ChatSocketHandler.socket_handlers:
+            try:
+                handler.write_message(message)
+            except:
+                logging.error('Error sending message', exc_info=True)
+
+    @web.asynchronous
+    def get(self):
+        if not self.request.arguments:
+            self.render("chat.html")
+            return
+        ChatHandler.callbacks.add(self.on_new_message)
+        self.user = user = self.get_cookie('user')
+        if not user:
+            self.user = user = str(uuid.uuid4())
+            self.set_cookie('user', user)
+        if user not in ChatHandler.users:
+            ChatHandler.users.add(user)
+            self.send_message('A new user has entered the chat room.')
+
+    def on_new_message(self, message):
+        if self.request.connection.stream.closed():
+            return
+        self.write(message)
+        self.finish()
+
+    def on_connection_close(self):
+        ChatHandler.callbacks.remove(self.on_new_message)
+        ChatHandler.users.discard(self.user)
+        self.send_message('A user has left the chat room.')
+
+    def post(self):
+        self.send_message(self.get_argument('text'))
+
+
+class ChatSocketHandler(websocket.WebSocketHandler):
+    socket_handlers = set()
+
+    def send_message(self, message):
+        for handler in ChatSocketHandler.socket_handlers:
+            try:
+                handler.write_message(message)
+            except:
+                logging.error('Error sending message', exc_info=True)
+
+    def open(self):
+        ChatSocketHandler.socket_handlers.add(self)
+        self.send_message('A new user has entered the chat room.')
+
+    def on_close(self):
+        ChatSocketHandler.socket_handlers.remove(self)
+        self.send_message('A user has left the chat room.')
+
+    def on_message(self, message):
+        self.send_message(message)
 
 
 class CategoryHandler(BaseHandler):

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
-<link rel="stylesheet" href="static/css/zTreeStyle/zTreeStyle.css" type="text/css">
+<link rel="stylesheet" href="{{ static_url('css/zTreeStyle/zTreeStyle.css') }}" type="text/css">
 {% end %}
 
 {% block message_body %}{% end %}
@@ -40,7 +40,7 @@
 {% end %}
 
 {% block body_tail %}
-<script src="static/js/jquery.ztree.all.min.js"></script>
+<script src="{{ static_url('js/jquery.ztree.all.min.js') }}"></script>
 <script>
     var setting = {
         data: {

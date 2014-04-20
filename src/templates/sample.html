@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
 {% block head %}
-<link rel="stylesheet" href="static/css/easyui-themes/bootstrap/easyui.css" type="text/css">
-<link rel="stylesheet" href="static/css/easyui-themes/icon.css" type="text/css">
+<link rel="stylesheet" href="{{ static_url('css/easyui-themes/bootstrap/easyui.css') }}" type="text/css">
+<link rel="stylesheet" href="{{ static_url('css/easyui-themes/icon.css') }}" type="text/css">
 {% end %}
 
 {% block message_body %}{% end %}
@@ -13,7 +13,7 @@
 {% end %}
 
 {% block body_tail %}
-<script src="static/js/jquery.easyui.min.js"></script>
+<script src="{{ static_url('js/jquery.easyui.min.js') }}"></script>
 <script>
     $(function () {
         $.get("/category?all", function (categories, status) {

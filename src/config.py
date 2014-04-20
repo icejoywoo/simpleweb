@@ -23,6 +23,7 @@ url_routers = [
 
     # jsonp测试
     (r"/jsonp", JsonpHandler),
+    (r"/chat/socket", ChatSocketHandler),
 
     # default
     (r"/", IndexHandler),
