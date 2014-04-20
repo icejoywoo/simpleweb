@@ -21,6 +21,9 @@ url_routers = [
     (r"/sample", SampleHandler),
     (r"/sample/([0-9]+)", SampleHandler),
 
+    # jsonp测试
+    (r"/jsonp", JsonpHandler),
+
     # default
     (r"/", IndexHandler),
     (r"/([^/]*)", DefaultHandler),

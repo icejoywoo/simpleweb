@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>jsonp demo</title>
+      <script type="text/javascript" src="{{ static_url('js/jquery.js') }}"></script>
+      <script type="text/javascript">
+     $(function(){
+        $.ajax({
+             type: "get",
+             async: false,
+             url: "/jsonp",
+             dataType: "jsonp",
+             jsonp: "callback", //传递给请求处理程序或页面的，用以获得jsonp回调函数名的参数名(一般默认为:callback)
+             jsonpCallback: "callbackHandler", //自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名，也可以写"?"，jQuery会自动为你处理数据
+             success: function(json){
+                 alert('Find a person: name:' + json.name + ', age: ' + json.age);
+                 $("#msg").html(json.toString());
+             },
+             error: function(){
+                 alert('fail');
+             }
+         });
+     });
+
+     // 原始js
+    // 得到航班信息查询结果后的回调函数
+    var callback_handler = function(data){
+        alert('Find a person: name:' + data.name + ', age: ' + data.age);
+    };
+    // 提供jsonp服务的url地址（不管是什么类型的地址，最终生成的返回值都是一段javascript代码）
+    var url = "/jsonp?callback=callback_handler";
+    // 创建script标签，设置其属性
+    var script = document.createElement('script');
+    script.setAttribute('src', url);
+    // 把script标签加入head，此时调用开始
+    document.getElementsByTagName('head')[0].appendChild(script);
+     </script>
+</head>
+<body>
+    <div id="msg"></div>
+</body>
+</html>

@@ -34,6 +34,26 @@ class DefaultHandler(BaseHandler):
         self.render("%s.html" % name)
 
 
+class JsonpHandler(BaseHandler):
+    """
+    http://www.cnblogs.com/dowinning/archive/2012/04/19/json-jsonp-jquery.html
+    """
+    def get(self):
+        if not self.request.arguments:
+            # 显示页面
+            self.render("jsonp.html")
+        else:
+            # 处理jsonp请求
+            callback = self.get_argument("callback")
+            data = {
+                "name": "John",
+                "age": 18,
+                "gender": "Male"
+            }
+            self.set_header("Content-Type", "text/javascript")
+            self.write("%s(%s)" % (callback, json.dumps(data)))
+
+
 class CategoryHandler(BaseHandler):
     def get(self):
         # 默认显示页面
